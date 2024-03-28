@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime
+from django.db.models import Q, Max, Min, Avg, Count
 
 
 class Author(models.Model):
@@ -120,5 +121,58 @@ class Author(models.Model):
         verbose_name_plural = "Авторы"
 
 
+class AuthorProfile(models.Model):
+    author = models.OneToOneField('Author', on_delete=models.CASCADE)
+    stage = models.IntegerField(default=0,
+                                blank=True,
+                                verbose_name="Стаж",
+                                help_text="Стаж в годах")
+
+    def __str__(self):
+        return f"Автор: {self.author.username}; Стаж: {self.stage} лет"
+
+    class Meta:
+        verbose_name = "Профиль автора"
+        verbose_name_plural = "Профили авторов"
+
+
+class Entry(models.Model):
+    text = models.TextField(verbose_name="Текст статьи",
+                            )
+    author = models.ForeignKey("Author", on_delete=models.CASCADE, related_name='entries')
+    tags = models.ManyToManyField("Tag", related_name='entries')
+
+    def __str__(self):
+        return f"Автор: {self.author.username}; Текст статьи: {self.text}; Теги: {self.tags.all()}"
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50,
+                            verbose_name="Название",
+                            )
+
+    def __str__(self):
+        return f"Тег: {self.name}"
+
+
+class TrainView(View):
+    def get(self, request):
+        # Создайте здесь запросы к БД
+        max_self_esteem = Author.objects.aggregate(max_self_esteem=Max('self_esteem'))
+        self.answer1 = Author.objects.filter(self_esteem=max_self_esteem['max_self_esteem'])
+        # TODO Какие авторы имеют самую высокую уровень самооценки(self_esteem)?
+        # self.answer2 = None  # TODO Какой автор имеет наибольшее количество опубликованных статей?
+        # self.answer3 = None  # TODO Какие статьи содержат тег 'Кино' или 'Музыка' ?
+        # self.answer4 = None  # TODO Сколько авторов женского пола зарегистрировано в системе?
+        # self.answer5 = None  # TODO Какой процент авторов согласился с правилами при регистрации?
+        # self.answer6 = None  # TODO Какие авторы имеют стаж от 1 до 5 лет?
+        # self.answer7 = None  # TODO Какой автор имеет наибольший возраст?
+        # self.answer8 = None  # TODO Сколько авторов указали свой номер телефона?
+        # self.answer9 = None  # TODO Какие авторы имеют возраст младше 25 лет?
+        # self.answer10 = None  # TODO Сколько статей написано каждым автором?
+
+        context = {f'answer{index}': self.__dict__[f'answer{index}'] for index in range(1, 11)}
+
+        return render(request, 'train_db/training_db.html', context=context)
 
 # Создайте свои модели здесь
