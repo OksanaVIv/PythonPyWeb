@@ -369,6 +369,27 @@ if __name__ == "__main__":
     # ## Выведет ошибку, так как поле entries не существует, виду различий между alias и annotate
     # # blogs = Blog.objects.alias(entries=Count('entry')).filter(entries__gt=4).values('blog', 'entries')
 
+    # from django.db.models import Avg, Q
+    #
+    # # Вычислить среднюю оценку только для уникальных значений
+    # average_rating = Entry.objects.aggregate(
+    #     average_rating1=Avg('rating', distinct=True)
+    # )
+    # print(average_rating)  # {'average_rating1': 3.6999999999999993}
+    #
+    # # Вычислить среднюю оценку с заданным значением по умолчанию(допустим
+    # # значение у поля None), если агрегация не возвращает результат
+    # average_rating_with_default = Entry.objects.aggregate(
+    #     average_rating2=Avg('rating', default=5.0)
+    # )
+    # print(average_rating_with_default) # {'average_rating2': 3.46}
+    #
+    # # Вычислить среднюю оценку только для статей, опубликованных после 2023 года
+    # average_rating = Entry.objects.aggregate(
+    #     average_rating3=Avg('rating', filter=Q(pub_date__year__gt=2023)))
+    # print(average_rating) # {'average_rating3': 2.925}
+    #
+
     from django.db.models import Avg, Q
 
     # Вычислить среднюю оценку только для уникальных значений
@@ -382,9 +403,9 @@ if __name__ == "__main__":
     average_rating_with_default = Entry.objects.aggregate(
         average_rating2=Avg('rating', default=5.0)
     )
-    print(average_rating_with_default) # {'average_rating2': 3.46}
+    print(average_rating_with_default)  # {'average_rating2': 3.46}
 
     # Вычислить среднюю оценку только для статей, опубликованных после 2023 года
     average_rating = Entry.objects.aggregate(
         average_rating3=Avg('rating', filter=Q(pub_date__year__gt=2023)))
-    print(average_rating) # {'average_rating3': 2.925}
+    print(average_rating)  # {'average_rating3': 2.925}
