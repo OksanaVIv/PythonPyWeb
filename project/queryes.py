@@ -392,20 +392,49 @@ if __name__ == "__main__":
 
     from django.db.models import Avg, Q
 
-    # Вычислить среднюю оценку только для уникальных значений
-    average_rating = Entry.objects.aggregate(
-        average_rating1=Avg('rating', distinct=True)
-    )
-    print(average_rating)  # {'average_rating1': 3.6999999999999993}
+    # # Вычислить среднюю оценку только для уникальных значений
+    # average_rating = Entry.objects.aggregate(
+    #     average_rating1=Avg('rating', distinct=True)
+    # )
+    # print(average_rating)  # {'average_rating1': 3.6999999999999993}
+    #
+    # # Вычислить среднюю оценку с заданным значением по умолчанию(допустим
+    # # значение у поля None), если агрегация не возвращает результат
+    # average_rating_with_default = Entry.objects.aggregate(
+    #     average_rating2=Avg('rating', default=5.0)
+    # )
+    # print(average_rating_with_default)  # {'average_rating2': 3.46}
+    #
+    # # Вычислить среднюю оценку только для статей, опубликованных после 2023 года
+    # average_rating = Entry.objects.aggregate(
+    #     average_rating3=Avg('rating', filter=Q(pub_date__year__gt=2023)))
+    # print(average_rating)  # {'average_rating3': 2.925}
 
-    # Вычислить среднюю оценку с заданным значением по умолчанию(допустим
-    # значение у поля None), если агрегация не возвращает результат
-    average_rating_with_default = Entry.objects.aggregate(
-        average_rating2=Avg('rating', default=5.0)
-    )
-    print(average_rating_with_default)  # {'average_rating2': 3.46}
+    # from django.db.models import Count
+    #
+    # # Вычислить число уникальных авторов статей(которые написали хотя бы одну статью)
+    # count_authors = Entry.objects.aggregate(
+    #     count_authors=Count('author', distinct=True)
+    # )
+    # print(count_authors)  # {'count_authors': 12}
+    #
+    # # Получить статьи с количеством тегов
+    # entries_with_tags_count = Entry.objects.annotate(
+    #     tag_count=Count('tags')).values('id', 'tag_count')
+    # print(entries_with_tags_count)
+    # """
+    # <QuerySet [
+    # {'id': 1, 'tag_count': 2},
+    # {'id': 2, 'tag_count': 1},
+    # {'id': 3, 'tag_count': 2},
+    # {'id': 4, 'tag_count': 2},
+    # ...
+    # """
+    from django.db.models import Max, Min
 
-    # Вычислить среднюю оценку только для статей, опубликованных после 2023 года
-    average_rating = Entry.objects.aggregate(
-        average_rating3=Avg('rating', filter=Q(pub_date__year__gt=2023)))
-    print(average_rating)  # {'average_rating3': 2.925}
+    # Вычислить максимальную и минимальную оценку
+    calc_rating = Entry.objects.aggregate(
+        max_rating=Max('rating'), min_rating=Min('rating')
+    )
+    print(calc_rating)  # {'max_rating': 5.0, 'min_rating': 0.0}
+
