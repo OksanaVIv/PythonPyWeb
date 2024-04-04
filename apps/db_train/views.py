@@ -10,7 +10,8 @@ class TrainView(View):
         self.answer1 = Author.objects.filter(self_esteem=max_self_esteem['max_self_esteem']) # TODO Какие авторы имеют самую высокую уровень самооценки(self_esteem)?
         count_article = Author.objects.annotate(number_of_article=Count('entries')).order_by('-number_of_article').first()
         self.answer2 = count_article  # TODO Какой автор имеет наибольшее количество опубликованных статей?
-        article_tag =
+        article_tag = Author.objects.filter(enrties__tags__name='Кино')
+
 
         self.answer3 = None  # TODO Какие статьи содержат тег 'Кино' или 'Музыка' ?
         self.answer4 = None  # TODO Сколько авторов женского пола зарегистрировано в системе?
