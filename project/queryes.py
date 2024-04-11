@@ -431,10 +431,176 @@ if __name__ == "__main__":
     # ...
     # """
     from django.db.models import Max, Min
+    #
+    # # Вычислить максимальную и минимальную оценку
+    # calc_rating = Entry.objects.aggregate(
+    #     max_rating=Max('rating'), min_rating=Min('rating')
+    # )
+    # print(calc_rating)  # {'max_rating': 5.0, 'min_rating': 0.0}
 
-    # Вычислить максимальную и минимальную оценку
-    calc_rating = Entry.objects.aggregate(
-        max_rating=Max('rating'), min_rating=Min('rating')
-    )
-    print(calc_rating)  # {'max_rating': 5.0, 'min_rating': 0.0}
+    from django.db.models import StdDev, Variance
+    #
+    # # Вычислить среднее квадратическое отклонение и дисперсию оценки
+    # calc_rating = Entry.objects.aggregate(
+    #     std_rating=StdDev('rating'), var_rating=Variance('rating')
+    # )
+    # print(calc_rating)  # {'std_rating': 1.6577092628081682, 'var_rating': 2.748}
+    #
+    # from django.db.models import Sum
+    #
+    # # Вычислить общее число комментариев в БД
+    # calc_rating = Entry.objects.aggregate(
+    #     sum_comments=Sum('number_of_comments')
+    # )
+    # print(calc_rating)  # {'sum_comments': 134}
+    #
+    # filtered_data = Blog.objects.filter(id__gte=2).order_by("id")
+    # print(filtered_data)  # упорядочивание по возрастанию по полю id
+    # """
+    # <QuerySet [
+    # <Blog: Кулинарные искушения>,
+    # <Blog: Фитнес и здоровый образ жизни>,
+    # <Blog: ИТ-новости и технологии>,
+    # <Blog: Мода и стиль>
+    # ]>
+    # """
+    # print(filtered_data.reverse())  # поменяли направление
+    # """
+    # <QuerySet [
+    # <Blog: Мода и стиль>,
+    # <Blog: ИТ-новости и технологии>,
+    # <Blog: Фитнес и здоровый образ жизни>,
+    # <Blog: Кулинарные искушения>
+    # ]>
+    # """
+    #
+    # # Если порядок не указан или в модели, или через order_by, то reverse работать не будет
+    # filtered_data = Blog.objects.filter(id__gte=2)
+    # print(filtered_data)
+    # print(filtered_data.reverse())
 
+    # print(Entry.objects.order_by('author', 'pub_date').distinct('author', 'pub_date'))  # Не работает в SQLite
+    # distinct('author', 'pub_date') - оставляет уникальные строки по колонкам author, pub_date
+    # distinct() - старается оставить уникальные данные по всем колонкам
+    # Аналогично с поиском по полю можно обращаться к связанным данным distinct('author__name', 'pub_date')
+
+    # Обычный запрос
+    # print(Blog.objects.filter(name__startswith='Фитнес'))
+    # <QuerySet [<Blog: Фитнес и здоровый образ жизни>]>
+
+    # Запрос раскрывающий значения
+    # print(Blog.objects.filter(name__startswith='Фитнес').values())
+    # """
+    # QuerySet [{'id': 3, 'name': 'Фитнес и здоровый образ жизни',
+    # # 'tagline': 'Позаботьтесь о своем здоровье, достигните физической формы и ощутите преимущества активного образа жизни!'}]>
+    # """
+    #
+    # # Вывод всех строк с их раскрытием
+    # print(Blog.objects.values())
+    # """
+    # <QuerySet [
+    # {'id': 1, 'name': 'Путешествия по миру', 'tagline': 'Откройте новые горизонты и погрузитесь в удивительные приключения вместе с нами!'},
+    # {'id': 2, 'name': 'Кулинарные искушения', 'tagline': 'Раскройте вкусовые грани и наслаждайтесь миром кулинарии вместе с нами!'},
+    # {'id': 3, 'name': 'Фитнес и здоровый образ жизни', 'tagline': 'Позаботьтесь о своем здоровье, достигните физической формы и ощутите преимущества активного образа жизни!'},
+    # {'id': 4, 'name': 'ИТ-новости и технологии', 'tagline': 'Будьте в курсе последних новостей, трендов и инноваций в мире информационных технологий!'},
+    # {'id': 5, 'name': 'Мода и стиль', 'tagline': 'Выражайте свою индивидуальность, следите за модными тенденциями и создавайте неповторимые образы вместе с нами!'}
+    # ]>
+    # """
+    # # Вывод всех строк с сохранением в запросе только необходимых столбцов
+    # print(Blog.objects.values('id', 'name'))  # Обратите внимание, что данные отсортированы по полю name
+    # """
+    # <QuerySet [
+    # {'id': 4, 'name': 'ИТ-новости и технологии'},
+    # {'id': 2, 'name': 'Кулинарные искушения'},
+    # {'id': 5, 'name': 'Мода и стиль'},
+    # {'id': 1, 'name': 'Путешествия по миру'},
+    # {'id': 3, 'name': 'Фитнес и здоровый образ жизни'}]>
+    # """
+    #
+    # # Вывод всех строк с их раскрытием
+    # print(Blog.objects.values_list())
+    # """
+    # <QuerySet [
+    # (1, 'Путешествия по миру', 'Откройте новые горизонты и погрузитесь в удивительные приключения вместе с нами!'),
+    # (2, 'Кулинарные искушения', 'Раскройте вкусовые грани и наслаждайтесь миром кулинарии вместе с нами!'),
+    # (3, 'Фитнес и здоровый образ жизни', 'Позаботьтесь о своем здоровье, достигните физической формы и ощутите преимущества активного образа жизни!'),
+    # (4, 'ИТ-новости и технологии', 'Будьте в курсе последних новостей, трендов и инноваций в мире информационных технологий!'),
+    # (5, 'Мода и стиль', 'Выражайте свою индивидуальность, следите за модными тенденциями и создавайте неповторимые образы вместе с нами!')
+    # ]>
+    # """
+    # # Вывод всех строк с сохранением в запросе только необходимых столбцов
+    # print(Blog.objects.values_list('id', 'name'))  # Обратите внимание, что данные отсортированы по полю name
+    # """
+    # <QuerySet [
+    # (4, 'ИТ-новости и технологии'),
+    # (2, 'Кулинарные искушения'),
+    # (5, 'Мода и стиль'),
+    # (1, 'Путешествия по миру'),
+    # (3, 'Фитнес и здоровый образ жизни')
+    # ]>
+    # """
+
+    # blog_a_entries = Entry.objects.filter(blog__name='Путешествия по миру')
+    # blog_b_entries = Entry.objects.filter(blog__name='Кулинарные искушения')
+    # blog_c_entries = Entry.objects.filter(blog__name='Фитнес и здоровый образ жизни')
+    # result_qs = blog_a_entries.union(blog_b_entries, blog_c_entries)
+    # print(result_qs)
+    #
+    # print(Entry.objects.filter(
+    #     blog__name__in=['Путешествия по миру', 'Кулинарные искушения', 'Фитнес и здоровый образ жизни']))
+
+    # blog_a_entries = Entry.objects.filter(blog__name='Путешествия по миру').values('author')
+    # blog_b_entries = Entry.objects.filter(blog__name='Кулинарные искушения').values('author')
+    # blog_c_entries = Entry.objects.filter(blog__name='Фитнес и здоровый образ жизни').values('author')
+    # result_qs = blog_a_entries.intersection(blog_b_entries, blog_c_entries)
+    # print(result_qs)
+
+    # blog_a_entries = Entry.objects.filter(blog__name='Путешествия по миру').values('author')
+    # blog_b_entries = Entry.objects.filter(blog__name='Кулинарные искушения').values('author')
+    # blog_c_entries = Entry.objects.filter(blog__name='Фитнес и здоровый образ жизни').values('author')
+    # result_qs = Entry.objects.values('author').difference(blog_a_entries, blog_b_entries, blog_c_entries)
+    # print(result_qs)
+    #
+    # print(Author.objects.filter(entries__author=None))
+
+    from django.db import connection
+
+    print("Число запросов = ", len(connection.queries), " Запросы = ", connection.queries)
+    """
+    Число запросов =  0  Запросы =  []
+    """
+    entry = Entry.objects.get(id=5)
+    print("Число запросов = ", len(connection.queries), " Запросы = ", connection.queries)
+    """
+    Число запросов =  1  Запросы =  [...]
+    """
+    blog = entry.blog
+    print("Число запросов = ", len(connection.queries), " Запросы = ", connection.queries)
+    """
+    Число запросов =  2  Запросы =  [...,...]
+    """
+    print('Результат запроса = ', blog)
+    """
+    Результат запроса =  Путешествия по миру
+    """
+
+    from django.db import connection
+
+    print("Число запросов = ", len(connection.queries), " Запросы = ", connection.queries)
+    """
+    Число запросов =  0  Запросы =  []
+    """
+    entry = Entry.objects.select_related('blog').get(id=5)
+    print("Число запросов = ", len(connection.queries), " Запросы = ", connection.queries)
+    """
+    Число запросов =  1  Запросы =  [...]
+    """
+    blog = entry.blog
+    print("Число запросов = ", len(connection.queries), " Запросы = ", connection.queries)
+    """
+    Число запросов =  1  Запросы =  [...,...]
+    """
+    print('Результат запроса = ', blog)
+    """
+    Результат запроса =  Путешествия по миру
+        """
