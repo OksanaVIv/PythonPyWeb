@@ -23,6 +23,8 @@ urlpatterns = [
     path('', include('apps.app.urls')),
     path('train/', include('apps.db_train.urls')),
     path('tinymce/', include('tinymce.urls')),
+    path('api_alter/', include('apps.db_train_alternative.urls')),
+
 ]
 
 if settings.DEBUG:
@@ -32,3 +34,5 @@ if settings.DEBUG:
     urlpatterns += [
         path("__debug__/", include("debug_toolbar.urls")),
     ]
+
+
