@@ -1,15 +1,18 @@
-from django.test import TestCase
+import django
+import os
 
-from django.test import TestCase
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
+django.setup()
+
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
+
 from apps.db_train_alternative.models import Author
-from .serializers import AuthorModelSerializer
+from apps.api.serializers import AuthorModelSerializer
 
 
 class AuthorViewSetTestCase(APITestCase):
-    fixtures = ['testdata.json']
     def setUp(self):
         print("Создаём данные в БД")
         self.author1 = Author.objects.create(name='John', email='john@example.com')
@@ -18,7 +21,6 @@ class AuthorViewSetTestCase(APITestCase):
     def test_list_authors(self):
         print("Запуск теста test_list_authors")
         print("______________________________")
-        print(f'В таблице автор {Author.objects.count()} значения')
         url = reverse('author-list')  # Получаем URL ссылку
         print(f"Проверяемы маршрут: {url}")
         response = self.client.get(url)
