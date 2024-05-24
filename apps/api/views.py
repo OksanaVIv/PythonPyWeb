@@ -14,6 +14,8 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import permissions
+from rest_framework import authentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class CustomPermission(permissions.BasePermission):
@@ -36,6 +38,7 @@ class CustomPermission(permissions.BasePermission):
 
         # Во всех остальных случаях возвращаем False
         return False
+
 
 
 class AuthorViewSet(ModelViewSet):
@@ -103,14 +106,17 @@ class AuthorAPIView(APIView):
         author.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 class AuthorGenericAPIView(GenericAPIView, RetrieveModelMixin, ListModelMixin, CreateModelMixin, UpdateModelMixin,
                            DestroyModelMixin):
     queryset = Author.objects.all()
     serializer_class = AuthorModelSerializer
 
     # Переопределяем атрибут permission_classes для указания нашего собственного разрешения
-    permission_classes = [CustomPermission]
+    # permission_classes = [CustomPermission]
+
+    permission_classes = [permissions.IsAuthenticated]
+    # authentication_classes = [authentication.TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
 
     def get(self, request, *args, **kwargs):
         if kwargs.get(self.lookup_field):  # если был передан id или pk
